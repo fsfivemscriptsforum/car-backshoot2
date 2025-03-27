@@ -1,44 +1,30 @@
-local sleep = 500
-
-
 local restrictedAngles = {
     min = 120.0,
     max = 240.0
 }
 
-Citizen.CreateThread(function()
-    while true do
-        Citizen.Wait(sleep)
+lib.onCache('ped', function(playerPed)
+    if not playerPed then return end
 
-        local playerPed = PlayerPedId()
+    while true do
+        Wait(0)
 
         if IsPedInAnyVehicle(playerPed, false) then
-                sleep = 0
-            local camDir = GetGameplayCamRelativeHeading()
-
-            if camDir < 0 then
-                camDir = 360 + camDir
-            end
+            local camDir = (GetGameplayCamRelativeHeading() + 360) % 360
 
             if camDir >= restrictedAngles.min and camDir <= restrictedAngles.max then
-                DisableControlAction(0, 24, true)
-                DisableControlAction(0, 25, true)
-                DisableControlAction(0, 68, true)
-                DisableControlAction(0, 69, true)
-                DisableControlAction(0, 70, true)
-                DisableControlAction(0, 92, true)
-                DisableControlAction(0, 114, true)
-                DisableControlAction(0, 257, true)
-                DisableControlAction(0, 331, true)
+                local controls = {24, 25, 68, 69, 70, 92, 114, 257, 331}
+                for _, control in ipairs(controls) do
+                    lib.disableControlAction(0, control, true)
+                end
 
                 if IsDisabledControlJustPressed(0, 24) or IsDisabledControlJustPressed(0, 25) then
-                    BeginTextCommandThefeedPost("STRING")
-                    AddTextComponentSubstringPlayerName("Nem tudsz hátrafelé lőni ❌")
-                    EndTextCommandThefeedPostTicker(false, true)
+                    lib.notify({
+                        title = 'Figyelmeztetés',
+                        description = 'Nem tudsz hátrafelé lőni ❌',
+                        type = 'error'
+                    })
                 end
             end
-            else
-                sleep = 500
         end
     end
-end)

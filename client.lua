@@ -1,3 +1,6 @@
+local sleep = 500
+
+
 local restrictedAngles = {
     min = 120.0,
     max = 240.0
@@ -5,11 +8,12 @@ local restrictedAngles = {
 
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(0)
+        Citizen.Wait(sleep)
 
         local playerPed = PlayerPedId()
 
         if IsPedInAnyVehicle(playerPed, false) then
+                sleep = 0
             local camDir = GetGameplayCamRelativeHeading()
 
             if camDir < 0 then
@@ -33,6 +37,8 @@ Citizen.CreateThread(function()
                     EndTextCommandThefeedPostTicker(false, true)
                 end
             end
+            else
+                sleep = 500
         end
     end
 end)
